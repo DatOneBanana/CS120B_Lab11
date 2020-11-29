@@ -13,14 +13,25 @@
 #include "simAVRHeader.h"
 #endif
 
+int firstOrsecond = 1;
+
+
 void transmit_data(unsigned char data){
 	int i;
 	for(i = 0; i < 8; ++i){
-		PORTC = 0x08;
+		if(firstOrsecond == 1){
+			PORTC = 0x08;
+		}else{
+			PORTC = 0x20;
+		}
 		PORTC |= ((data >> i) & 0x01);
 		PORTC |= 0x02;
 	}
-	PORTC |= 0x04;
+	if(firstOrsecond == 1){
+		PORTC |= 0x04;
+	} else {
+		PORTC |= 0x10;
+	}
 	PORTC = 0x00;
 }
 
@@ -85,7 +96,7 @@ void tick(){
 
 }
 
-enum SECONDSTATS{Start5, decide2, increment2, decrement2, onOroff2}state;
+enum SECONDSTATS{Start5, decide2, increment2, decrement2, onOroff2}state5;
 
 int counter2 = 0;
 
@@ -276,9 +287,12 @@ int main(void) {
 	state2 = Start2;
 	state3 = Start3;
 	state4 = Start4;
+	state5 = Start5;
 	unsigned char nullVal = 0;
     /* Insert your solution below */
     while (1) {
+	
+	firstOrSecond = 1;
 	tick();
 
 	if(temp3 == 1){
@@ -295,6 +309,7 @@ int main(void) {
 		transmit_data(value);
 	}
 
+	firstOrSecond = 0;
 	tick5();
 	if(temp6 == 1){
 		transmit_data(nullVal);
