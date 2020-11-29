@@ -85,6 +85,67 @@ void tick(){
 
 }
 
+enum SECONDSTATS{Start5, decide2, increment2, decrement2, onOroff2}state;
+
+int counter2 = 0;
+
+unsigned char temp4;
+unsigned char temp5;
+unsigned char temp6;
+
+void tick5(){
+	temp4 = ~PINB & 0x04;
+        temp5 = ~PINB & 0x08;
+        switch(state5){
+                case Start5:
+                        state5 = decide2;
+                        break;
+                case decide2:
+                        if(temp4 && temp5){
+                                state5 = onOroff2;
+
+                        }
+                        else if(temp4 && !temp5){
+                                state5 = increment2;
+                        }
+                        else if(!temp4 && temp5){
+                                state5 = decrement2;
+                        }
+                        else { state5 = decide2; }
+                        break;
+                case increment2:
+                        state5 = decide2;
+                        break;
+                case decrement2:
+                        state5 = decide2;
+                        break;
+                case onOroff2:
+                        state5 = decide2;
+                        break;
+                }
+        switch(state5){
+                case Start5:
+                        break;
+                case decide2:
+                        break;
+                case increment2:
+                        counter2++;
+                        break;
+                case decrement2:
+                        counter2--;
+                        break;
+                case onOroff2:
+                        if(temp6 == 1){
+                                temp6 = 0;
+                        }
+                        else{
+                                temp6 = 1;
+			}
+			break;
+		}
+}
+
+
 enum LEDSTATES{Start2, Led1, Led2, Led3, Led4, Led5, Led6, Led7} state2;
 
 void tick2(){
@@ -225,6 +286,21 @@ int main(void) {
 	}
 	else{
 		if(counter % 3 == 0){
+			tick2();
+		} else if(counter % 3 == 1){
+			tick3();
+		} else if(counter % 3 == 2){
+			tick4();
+		}
+		transmit_data(value);
+	}
+
+	tick5();
+	if(temp6 == 1){
+		transmit_data(nullVal);
+	}
+	else{
+		if(counter2 % 3 == 0){
 			tick2();
 		} else if(counter % 3 == 1){
 			tick3();
