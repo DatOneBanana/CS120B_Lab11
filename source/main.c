@@ -12,6 +12,17 @@
 #include "simAVRHeader.h"
 #endif
 
+void transmit_data(unsigned char data){
+	int i;
+	for(i = 0; i < 8; ++i){
+		PORTC = 0x08;
+		PORTC |= ((data >> i) & 0x01);
+		PORTC |= 0x02;
+	}
+	PORTC |= 0x04;
+	PORTC = 0x00;
+}
+
 enum States {Start, Init, Increment, Decrement, Reset, Wait, WaitA} state;
 unsigned char value;
 
@@ -19,8 +30,8 @@ unsigned char temp;
 unsigned char temp2;
 
 void tick(){
-	temp = ~PINA & 0x01;
-	temp2 = ~PINA & 0x02;
+	temp = ~PINB & 0x01;
+	temp2 = ~PINB & 0x02;
 	switch (state){
 		case Start:
 			state = Init;
@@ -104,7 +115,7 @@ void tick(){
 		case Init:
 			break;
 		case Increment:
-			if(value < 9){
+			if(value < 255){
 				value++;
 			}
 			break;
@@ -123,10 +134,15 @@ void tick(){
 
 int main(void) {
     /* Insert DDR and PORT initializations */
+	DDRB = 0x00; PORTB = 0xFF;
+	DDRC = 0xFF; PORTC = 0x00;
 
+	state = Start;
+	value = 1;
     /* Insert your solution below */
     while (1) {
-
+	tick();
+	transmit_data(value);
     }
     return 1;
 }
